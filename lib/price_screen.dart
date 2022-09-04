@@ -1,5 +1,6 @@
 import 'dart:io' show Platform;
 import 'package:bitcoin/coin_data.dart';
+import 'package:bitcoin/services/networking.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 
@@ -9,7 +10,9 @@ class PriceScreen extends StatefulWidget {
 }
 
 class _PriceScreenState extends State<PriceScreen> {
+  NetworkModel netModel = NetworkModel();
   String selectCurrency = 'USD';
+  late double rate;
   DropdownButton<String> androidDropdown() {
     List<DropdownMenuItem<String>> items = [];
     for (int i = 0; i < currenciesList.length; i++) {
@@ -29,7 +32,6 @@ class _PriceScreenState extends State<PriceScreen> {
           });
         });
   }
-
   CupertinoPicker iOSPicker() {
     List<Text> pickerItems = [];
     for (String currency in currenciesList) {
@@ -52,8 +54,15 @@ class _PriceScreenState extends State<PriceScreen> {
       return androidDropdown();
     }
   }
+void setRate(){
+    netModel.getBTCPrice();
+    setState(() {
+      rate = netModel.btcPrice;
+    });
+}
   @override
   Widget build(BuildContext context) {
+    setRate();
     return Scaffold(
       appBar: AppBar(
         title: Text('🤑 Coin Ticker'),
@@ -70,12 +79,12 @@ class _PriceScreenState extends State<PriceScreen> {
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(10.0),
               ),
-              child: const Padding(
-                padding: EdgeInsets.symmetric(vertical: 15.0, horizontal: 28.0),
+              child:  Padding(
+                padding:const EdgeInsets.symmetric(vertical: 15.0, horizontal: 28.0),
                 child: Text(
-                  '1 BTC = ? USD',
+                  '1 BTC = ${rate.toStringAsFixed(1)} USD',
                   textAlign: TextAlign.center,
-                  style: TextStyle(
+                  style:const  TextStyle(
                     fontSize: 20.0,
                     color: Colors.white,
                   ),
