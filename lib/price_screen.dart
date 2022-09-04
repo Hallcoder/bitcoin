@@ -12,7 +12,7 @@ class PriceScreen extends StatefulWidget {
 class _PriceScreenState extends State<PriceScreen> {
   NetworkModel netModel = NetworkModel();
   String selectCurrency = 'USD';
-  late double rate;
+  double rate = 0.0;
   DropdownButton<String> androidDropdown() {
     List<DropdownMenuItem<String>> items = [];
     for (int i = 0; i < currenciesList.length; i++) {
@@ -27,9 +27,7 @@ class _PriceScreenState extends State<PriceScreen> {
         value: selectCurrency,
         items: items,
         onChanged: (value) {
-          setState(() {
-            selectCurrency = value!;
-          });
+          setCurrencyAndRate(value);
         });
   }
   CupertinoPicker iOSPicker() {
@@ -43,7 +41,7 @@ class _PriceScreenState extends State<PriceScreen> {
         backgroundColor: Colors.lightBlueAccent,
         itemExtent: 32.0,
         onSelectedItemChanged: (value) {
-          print(value);
+         setCurrencyAndRate(currenciesList[value]);
         },
         children: pickerItems);
   }
@@ -54,15 +52,17 @@ class _PriceScreenState extends State<PriceScreen> {
       return androidDropdown();
     }
   }
-void setRate(){
-    netModel.getBTCPrice();
+void setCurrencyAndRate(currency){
     setState(() {
+      selectCurrency = currency;
+      netModel.getBTCPrice(selectCurrency);
       rate = netModel.btcPrice;
     });
+
 }
+
   @override
   Widget build(BuildContext context) {
-    setRate();
     return Scaffold(
       appBar: AppBar(
         title: Text('🤑 Coin Ticker'),
@@ -82,7 +82,7 @@ void setRate(){
               child:  Padding(
                 padding:const EdgeInsets.symmetric(vertical: 15.0, horizontal: 28.0),
                 child: Text(
-                  '1 BTC = ${rate.toStringAsFixed(1)} USD',
+                  '1 BTC = ${rate.toStringAsFixed(1)} $selectCurrency',
                   textAlign: TextAlign.center,
                   style:const  TextStyle(
                     fontSize: 20.0,
