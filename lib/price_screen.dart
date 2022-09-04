@@ -1,5 +1,6 @@
 import 'dart:io' show Platform;
 import 'package:bitcoin/coin_data.dart';
+import 'package:bitcoin/components/Padding.dart';
 import 'package:bitcoin/services/networking.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
@@ -11,8 +12,17 @@ class PriceScreen extends StatefulWidget {
 
 class _PriceScreenState extends State<PriceScreen> {
   NetworkModel netModel = NetworkModel();
-  String selectCurrency = 'USD';
-  double rate = 0.0;
+   String selectCurrency = 'USD';
+  // List<Widget> getCurrencyBlocks() {
+  //   List<Padding2> currencyBlocks = [];
+  //   for (String crypto in cryptoList) {
+  //     currencyBlocks.add(
+  //       Padding2(selectedCurrency: selectCurrency, mainCurrency: crypto),
+  //     );
+  //   }
+  //   return currencyBlocks;
+  // }
+
   DropdownButton<String> androidDropdown() {
     List<DropdownMenuItem<String>> items = [];
     for (int i = 0; i < currenciesList.length; i++) {
@@ -27,9 +37,10 @@ class _PriceScreenState extends State<PriceScreen> {
         value: selectCurrency,
         items: items,
         onChanged: (value) {
-          setCurrencyAndRate(value);
+          setCurrency(value);
         });
   }
+
   CupertinoPicker iOSPicker() {
     List<Text> pickerItems = [];
     for (String currency in currenciesList) {
@@ -38,28 +49,28 @@ class _PriceScreenState extends State<PriceScreen> {
       );
     }
     return CupertinoPicker(
-        backgroundColor: Colors.lightBlueAccent,
-        itemExtent: 32.0,
-        onSelectedItemChanged: (value) {
-         setCurrencyAndRate(currenciesList[value]);
-        },
-        children: pickerItems);
+      backgroundColor: Colors.lightBlueAccent,
+      itemExtent: 32.0,
+      onSelectedItemChanged: (value) {
+        setCurrency(currenciesList[value]);
+      },
+      children: pickerItems,
+    );
   }
-  Widget getPicker(){
-    if(Platform.isIOS){
+
+  Widget getPicker() {
+    if (Platform.isIOS) {
       return iOSPicker();
-    }else{
+    } else {
       return androidDropdown();
     }
   }
-void setCurrencyAndRate(currency){
+
+  void setCurrency(currency) {
     setState(() {
       selectCurrency = currency;
-      netModel.getBTCPrice(selectCurrency);
-      rate = netModel.btcPrice;
     });
-
-}
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -71,31 +82,13 @@ void setCurrencyAndRate(currency){
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
-          Padding(
-            padding: const EdgeInsets.fromLTRB(18.0, 18.0, 18.0, 0),
-            child: Card(
-              color: Colors.lightBlueAccent,
-              elevation: 5.0,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10.0),
-              ),
-              child:  Padding(
-                padding:const EdgeInsets.symmetric(vertical: 15.0, horizontal: 28.0),
-                child: Text(
-                  '1 BTC = ${rate.toStringAsFixed(1)} $selectCurrency',
-                  textAlign: TextAlign.center,
-                  style:const  TextStyle(
-                    fontSize: 20.0,
-                    color: Colors.white,
-                  ),
-                ),
-              ),
-            ),
-          ),
+         Padding2(selectedCurrency: selectCurrency, mainCurrency: 'ETH'),
+         Padding2(selectedCurrency: selectCurrency, mainCurrency: 'LTC'),
+         Padding2(selectedCurrency: selectCurrency, mainCurrency: 'BTC'),
           Container(
             height: 150.0,
             alignment: Alignment.center,
-            padding: EdgeInsets.only(bottom: 30.0),
+            padding: const EdgeInsets.only(bottom: 30.0),
             color: Colors.lightBlue,
             child: getPicker(),
           ),
